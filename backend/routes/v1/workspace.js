@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { createWorkspaceController } from '../../controllers/workSpaceController.js'
+import { createWorkspaceController, getWorkspacesUserIsMemberOfController } from '../../controllers/workSpaceController.js'
 import { isAuthenticated } from '../../middlewares/authMiddleware.js';
 import { createWorkspaceSchema } from '../../validators/workspaceSchema.js';
 import { validate } from '../../validators/zodValidator.js';
@@ -13,4 +13,7 @@ router.post(
   validate(createWorkspaceSchema),
   createWorkspaceController
 );
+
+router.get('/', isAuthenticated, getWorkspacesUserIsMemberOfController);
+
 export default router;
