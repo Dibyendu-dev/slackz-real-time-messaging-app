@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { createWorkspaceService, deleteWorkspaceService, getWorkspaceService, getWorkspacesUserIsMemberOfService, updateWorkspaceService } from '../services/workspaceService.js';
+import { addMemberToWorkspaceService, createWorkspaceService, deleteWorkspaceService, getWorkspaceService, getWorkspacesUserIsMemberOfService, updateWorkspaceService } from '../services/workspaceService.js';
 import {
   customErrorResponse,
   internalErrorResponse,
@@ -121,6 +121,31 @@ export const updateWorkspaceController = async (req, res) => {
       .json(successResponse(response, 'Workspace updated successfully'));
   } catch (error) {
     console.log('update workspace controller error', error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error));
+    }
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(internalErrorResponse(error));
+  }
+};
+
+export const addMemberToWorkspaceController = async (req, res) => {
+  try {
+    const response = await addMemberToWorkspaceService(
+      req.params.workspaceId,
+      req.body.memberId,
+      req.body.role || 'member',
+      req.user
+    );
+    return res
+      .status(StatusCodes.OK)
+      .json(
+        successResponse(response, 'Member added to workspace successfully')
+      );
+  } catch (error) {
+    console.log('add member to workspace controller error', error);
     if (error.statusCode) {
       return res.status(error.statusCode).json(customErrorResponse(error));
     }
