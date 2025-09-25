@@ -4,6 +4,18 @@ import workspaceRepository from '../repositories/workspaceRepository.js';
 import ValidationError from '../utils/errors/validationError.js';
 import channelRepository from '../repositories/channelRepository.js';
 
+const isUserAdminOfWorkspace = (workspace, userId) => {
+  return workspace.members.find(
+    (member) => member.memberId.toString() === userId && member.role === 'admin'
+  );
+};
+
+const isUserMemberOfWorkspace = (workspace, userId) => {
+  return workspace.members.find(
+    (member) => member.memberId.toString() === userId
+  );
+};
+
 export const createWorkspaceService = async (workspaceData) => {
   try {
     const joinCode = uuidv4().substring(0, 6).toUpperCase();
@@ -69,12 +81,8 @@ export const deleteWorkspaceService = async (workspaceId, userId) => {
       });
     }
     
-    const isAllowed = workspace.members.find(
-      (member) =>
-        member.memberId.toString() === userId && member.role === 'admin'
-    );
-    //   const channelIds = workspace.channels.map((channel) => channel._id);
-
+    const isAllowed = isUserAdminOfWorkspace(workspace,userId)
+  
     if (isAllowed) {
       await channelRepository.deleteMany(workspace.channels);
 
@@ -88,6 +96,31 @@ export const deleteWorkspaceService = async (workspaceId, userId) => {
     });
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+};
+
+export const getWorkspaceService = async (workspaceId, userId) => {
+  try {
+    const workspace = await workspaceRepository.getById(workspaceId);
+    if (!workspace) {
+      throw new ClientError({
+        explanation: 'Invalid data sent from the client',
+        message: 'Workspace not found',
+        statusCode: StatusCodes.NOT_FOUND
+      });
+    }
+    const isMember = isUserMemberOfWorkspace(workspace, userId);
+    if (!isMember) {
+      throw new ClientError({
+        explanation: 'User is not a member of the workspace',
+        message: 'User is not a member of the workspace',
+        statusCode: StatusCodes.UNAUTHORIZED
+      });
+    }
+    return workspace;
+  } catch (error) {
+    console.log('Get workspace service error', error);
     throw error;
   }
 };
