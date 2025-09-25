@@ -151,3 +151,36 @@ export const getWorkspaceByJoinCodeService = async (joinCode, userId) => {
     throw error;
   }
 };
+
+export const updateWorkspaceService = async (
+  workspaceId,
+  workspaceData,
+  userId
+) => {
+  try {
+    const workspace = await workspaceRepository.getById(workspaceId);
+    if (!workspace) {
+      throw new ClientError({
+        explanation: 'Invalid data sent from the client',
+        message: 'Workspace not found',
+        statusCode: StatusCodes.NOT_FOUND
+      });
+    }
+    const isAdmin = isUserAdminOfWorkspace(workspace, userId);
+    if (!isAdmin) {
+      throw new ClientError({
+        explanation: 'User is not an admin of the workspace',
+        message: 'User is not an admin of the workspace',
+        statusCode: StatusCodes.UNAUTHORIZED
+      });
+    }
+    const updatedWorkspace = await workspaceRepository.update(
+      workspaceId,
+      workspaceData
+    );
+    return updatedWorkspace;
+  } catch (error) {
+    console.log('update workspace service error', error);
+    throw error;
+  }
+};
