@@ -87,3 +87,24 @@ export const getWorkspaceController = async (req, res) => {
       .json(internalErrorResponse(error));
   }
 };
+
+export const getWorkspaceByJoinCodeController = async (req, res) => {
+  try {
+    const response = await getWorkspaceByJoinCodeService(
+      req.params.joinCode,
+      req.user
+    );
+    return res
+      .status(StatusCodes.OK)
+      .json(successResponse(response, 'Workspace fetched successfully'));
+  } catch (error) {
+    console.log('Get workspace by joincode controller error', error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error));
+    }
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(internalErrorResponse(error));
+  }
+};
