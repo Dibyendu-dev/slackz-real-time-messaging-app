@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { addChannelToWorkspaceService, addMemberToWorkspaceService, createWorkspaceService, deleteWorkspaceService, getWorkspaceService, getWorkspacesUserIsMemberOfService, updateWorkspaceService } from '../services/workspaceService.js';
+import { addChannelToWorkspaceService, addMemberToWorkspaceService, createWorkspaceService, deleteWorkspaceService, getWorkspaceByJoinCodeService, getWorkspaceService, getWorkspacesUserIsMemberOfService, updateWorkspaceService } from '../services/workspaceService.js';
 import {
   customErrorResponse,
   internalErrorResponse,
