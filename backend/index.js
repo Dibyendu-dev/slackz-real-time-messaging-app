@@ -1,11 +1,15 @@
 import express from 'express';
+import { createServer } from 'http';
 import { StatusCodes } from 'http-status-codes';
+import { Server } from 'socket.io';
 import { PORT } from './config/serverConfig.js';
 import connectDB from './config/dbConfig.js';
 import apiRouter from './routes/apiRoute.js'
 import bullServerAdapter from './config/bullBoardConfig.js'
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
 
 
 app.use(express.json());
@@ -19,7 +23,17 @@ app.get('/ping', (req, res) => {
   return res.status(StatusCodes.OK).json({ message: 'pong' });
 });
 
-app.listen(PORT, () => {
+io.on('connection', (socket) => {
+  console.log('a user connected', socket.id);
+
+  socket.on('messageFromClient', (data) => {
+    console.log('Message from client', data);
+
+    io.emit('new message', data.toUpperCase());
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   connectDB()
 });
