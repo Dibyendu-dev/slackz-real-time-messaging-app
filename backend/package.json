@@ -13,6 +13,7 @@
     "lint:fix": "eslint . --fix "
   },
   "dependencies": {
+    "@bull-board/express": "^6.13.0",
     "bcrypt": "^6.0.0",
     "bull": "^4.16.5",
     "dotenv": "^17.2.2",
