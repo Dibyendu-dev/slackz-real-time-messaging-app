@@ -25,7 +25,7 @@ export const getMessagesService = async (messageParams, page, limit, user) => {
 
   const messages = await messageRepository.getPaginatedMessaged(
     messageParams,
-    page,
+    page, 
     limit
   );
   return messages;
